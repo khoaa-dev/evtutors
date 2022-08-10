@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/Header">
+    </FrameLayout>
 
-    <TextView
-        android:id="@+id/itemcall"
-        android:layout_width="wrap_content"
+    <com.etebarian.meowbottomnavigation.MeowBottomNavigation
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="call video"
-        android:textSize="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.263"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.23" />
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        app:mbn_circleColor="@color/main_color"
+        app:mbn_defaultIconColor="@color/main_color"
+        app:mbn_selectedIconColor="#000000"
+        app:mbn_shadowColor="@color/main_color"></com.etebarian.meowbottomnavigation.MeowBottomNavigation>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
