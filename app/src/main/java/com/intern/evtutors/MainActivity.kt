@@ -1,5 +1,4 @@
 package com.intern.evtutors
-
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -8,13 +7,11 @@ import com.etebarian.meowbottomnavigation.MeowBottomNavigation
 import com.intern.evtutors.fragments.WeeklyScheduleFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
     var txtAllCollections: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         //Footer
         //Add footer item
         //Add footer
