@@ -1,5 +1,6 @@
 package com.intern.evtutors.activities
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -29,9 +30,7 @@ class DemoStream : AppCompatActivity() {
         if(allPermissionsGranted()) {
             startCamera()
         } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), 22)
         }
 
         btn_camera.setOnClickListener {
@@ -49,13 +48,20 @@ class DemoStream : AppCompatActivity() {
             Toast.makeText(baseContext,"fafds", Toast.LENGTH_SHORT)
             startActivity(intent)
         }
+
+        btn_start.setOnClickListener {
+            val intent = Intent(this, Call::class.java)
+            intent.putExtra("micStatus", microStatus)
+            intent.putExtra("camStatus", cameraStatus)
+            startActivity(intent)
+        }
     }
 
     private fun handleOnclickCamera() {
         previewView.isVisible = cameraStatus
         txt_camera.isVisible = !cameraStatus
         if(cameraStatus) {
-            btn_camera.setImageResource(R.drawable.ic_camera)
+            btn_camera.setImageResource(R.drawable.ic_camera2)
         } else {
             btn_camera.setImageResource(R.drawable.ic_uncapture)
         }
