@@ -27,12 +27,10 @@ class DemoStream : AppCompatActivity() {
         setContentView(R.layout.activity_demo_stream)
 
         //Allowing permission
-        if(allPermissionsGranted()) {
-            startCamera()
-        } else {
+        if(!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), 22)
         }
-
+        startCamera()
         btn_camera.setOnClickListener {
             cameraStatus=!cameraStatus
             handleOnclickCamera()
@@ -50,9 +48,11 @@ class DemoStream : AppCompatActivity() {
         }
 
         btn_start.setOnClickListener {
+            val channelName = intent.getStringExtra("channelName").toString()
             val intent = Intent(this, Call::class.java)
             intent.putExtra("micStatus", microStatus)
             intent.putExtra("camStatus", cameraStatus)
+            intent.putExtra("channelName", channelName)
             startActivity(intent)
         }
     }
@@ -123,7 +123,6 @@ class DemoStream : AppCompatActivity() {
 
     //COMPANION OBJECT: consist of methods that we want to use without creating 'class'
      companion object {
-            private const val REQUEST_CODE_PERMISSIONS = 10
             private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
      }
 }

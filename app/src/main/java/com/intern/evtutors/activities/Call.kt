@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.activity_call.*
 class Call : AppCompatActivity() {
     var isCamera:Boolean=true
     var isMicro:Boolean=true
+    var channelName:String=""
     private var mRtcEngine:RtcEngine?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +23,7 @@ class Call : AppCompatActivity() {
         //Get intent extra
         isCamera = intent.getBooleanExtra("camStatus", true)
         isMicro = intent.getBooleanExtra("micStatus", true)
+        channelName = intent.getStringExtra("channelName").toString()
 
         startAgoraEngineAndJoin()
         handleMicroOnOff()
@@ -61,7 +63,7 @@ class Call : AppCompatActivity() {
     }
 
     private fun joinChannel() {
-        mRtcEngine!!.joinChannel(token, CHANNEL_NAME, null, 0)
+        mRtcEngine!!.joinChannel(token, channelName, null, 0)
     }
 
     private fun initializeAgoraEngine() {
@@ -112,10 +114,11 @@ class Call : AppCompatActivity() {
     private fun handleCameraOnOff() {
         if(isCamera) {
             camera.setImageResource(R.drawable.ic_camera)
-            local_video_view_container.setBackgroundResource(R.drawable.ic_view_container)
+            setupLocalVideo()
             mRtcEngine!!.enableLocalVideo(true)
         } else {
             camera.setImageResource(R.drawable.ic_stopcamera)
+            local_video_view_container.removeAllViews()
             mRtcEngine!!.enableLocalVideo(false)
         }
     }
