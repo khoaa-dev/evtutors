@@ -1,5 +1,6 @@
 package com.intern.evtutors.activities
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -26,14 +27,10 @@ class DemoStream : AppCompatActivity() {
         setContentView(R.layout.activity_demo_stream)
 
         //Allowing permission
-        if(allPermissionsGranted()) {
-            startCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
+        if(!allPermissionsGranted()) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), 22)
         }
-
+        startCamera()
         btn_camera.setOnClickListener {
             cameraStatus=!cameraStatus
             handleOnclickCamera()
@@ -49,13 +46,22 @@ class DemoStream : AppCompatActivity() {
             Toast.makeText(baseContext,"fafds", Toast.LENGTH_SHORT)
             startActivity(intent)
         }
+
+        btn_start.setOnClickListener {
+            val channelName = intent.getStringExtra("channelName").toString()
+            val intent = Intent(this, Call::class.java)
+            intent.putExtra("micStatus", microStatus)
+            intent.putExtra("camStatus", cameraStatus)
+            intent.putExtra("channelName", channelName)
+            startActivity(intent)
+        }
     }
 
     private fun handleOnclickCamera() {
         previewView.isVisible = cameraStatus
         txt_camera.isVisible = !cameraStatus
         if(cameraStatus) {
-            btn_camera.setImageResource(R.drawable.ic_camera)
+            btn_camera.setImageResource(R.drawable.ic_camera2)
         } else {
             btn_camera.setImageResource(R.drawable.ic_uncapture)
         }
@@ -117,7 +123,6 @@ class DemoStream : AppCompatActivity() {
 
     //COMPANION OBJECT: consist of methods that we want to use without creating 'class'
      companion object {
-            private const val REQUEST_CODE_PERMISSIONS = 10
             private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
      }
 }

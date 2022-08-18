@@ -5,7 +5,7 @@
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.WeeklyScheduleActivity">
+    tools:context=".MainActivity">
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -95,6 +95,7 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:visibility="invisible"
             android:background="@drawable/top_border_radius"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -123,8 +124,7 @@
             android:paddingTop="24dp"
             android:paddingBottom="24dp"
             android:scrollbars="none"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weekCalendar" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
