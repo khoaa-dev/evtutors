@@ -60,4 +60,7 @@ dependencies {
 
     //agora sdk
     implementation 'com.github.agorabuilder:native-full-sdk:3.5.0.3'
+
+    //Android networking
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
 }

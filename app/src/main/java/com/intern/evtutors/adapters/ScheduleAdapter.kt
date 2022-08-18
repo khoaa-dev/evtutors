@@ -59,6 +59,7 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
          var courses:Courses = data[position]
 
 //        handle checking class is streaming or not (must fixed)
+
         viewHolder.time.text = courses.timeBegin
         viewHolder.timeEnd.text = courses.timeEnd
         viewHolder.className.text = courses.className
