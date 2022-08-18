@@ -4,17 +4,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import com.androidnetworking.AndroidNetworking
+import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONArrayRequestListener
+import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.intern.evtutors.R
 import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
+import org.json.JSONArray
+import org.json.JSONObject
 
 class Call : AppCompatActivity() {
     var isCamera:Boolean=true
     var isMicro:Boolean=true
     var channelName:String=""
+    var token:String=""
     private var mRtcEngine:RtcEngine?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +59,22 @@ class Call : AppCompatActivity() {
         mRtcEngine = null
     }
 
+    private fun createToken() {
+        ///api/generateToken/appID={appID}&appCertificate={appCertificate}&channelName={channelName}
+        return AndroidNetworking.get("http://192.168.1.55:8080/api/generateToken/appID=$APP_ID&appCertificate=$APP_CERTIFICATE&channelName=${channelName}")
+            .build()
+            .getAsJSONObject(object : JSONObjectRequestListener {
+                override fun onResponse(response: JSONObject?) {
+                    token=response!!.getString("token")
+                    Log.d("Response token: ", response!!.getString("token"))
+                }
+
+                override fun onError(anError: ANError?) {
+                    Log.d("Get app id error: ", anError.toString())
+                }
+            })
+    }
+
     private fun startAgoraEngineAndJoin() {
         initializeAgoraEngine()
         mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
@@ -59,6 +82,7 @@ class Call : AppCompatActivity() {
         mRtcEngine!!.enableVideo()
         mRtcEngine!!.enableAudio()
         setupLocalVideo()
+        createToken()
         joinChannel()
     }
 
