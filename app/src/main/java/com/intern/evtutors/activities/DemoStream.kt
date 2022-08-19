@@ -1,7 +1,9 @@
 package com.intern.evtutors.activities
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,19 +15,24 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.androidnetworking.AndroidNetworking
+import com.androidnetworking.error.ANError
+import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.intern.evtutors.MainActivity
 import com.intern.evtutors.R
 import kotlinx.android.synthetic.main.activity_demo_stream.*
+import org.json.JSONArray
 
 class DemoStream : AppCompatActivity() {
     //state of camera and micro
     private var cameraStatus:Boolean = true
     private var microStatus:Boolean = true
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_demo_stream)
-
+        getAppId()
         //Allowing permission
         if(!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), 22)
@@ -117,6 +124,25 @@ class DemoStream : AppCompatActivity() {
         ContextCompat.checkSelfPermission(
             baseContext, it
         ) == PackageManager.PERMISSION_GRANTED
+
+    }
+
+    private fun getAppId() {
+        val sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        AndroidNetworking.get("http://call-video-service.herokuapp.com/api/agoraApp")
+            .build()
+            .getAsJSONArray(object : JSONArrayRequestListener {
+                override fun onResponse(response: JSONArray?) {
+                    editor.putString("APP_ID", response!!.getJSONObject(0).getString("appID").toString())
+                    editor.putString("APP_CERTIFICATE", response!!.getJSONObject(0).getString("appCertificate").toString())
+                    editor.commit()
+                }
+                override fun onError(anError: ANError?) {
+                    Log.d("Get app id error: ", anError.toString())
+                }
+
+            })
 
     }
 

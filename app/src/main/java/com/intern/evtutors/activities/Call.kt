@@ -1,7 +1,10 @@
 package com.intern.evtutors.activities
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import com.androidnetworking.AndroidNetworking
@@ -20,23 +23,29 @@ import org.json.JSONObject
 class Call : AppCompatActivity() {
     var isCamera:Boolean=true
     var isMicro:Boolean=true
-    var channelName:String=""
-    var token:String=""
+    private var channelName:String=""
+    private var token:String=""
+    private var appId = ""
+    private var appCerti = ""
     private var mRtcEngine:RtcEngine?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
+        val sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE)
+        appId = sharedPreferences.getString("APP_ID", "").toString()
+        appCerti = sharedPreferences.getString("APP_CERTIFICATE", "").toString()
 
         //Get intent extra
         isCamera = intent.getBooleanExtra("camStatus", true)
         isMicro = intent.getBooleanExtra("micStatus", true)
         channelName = intent.getStringExtra("channelName").toString()
 
+
+
         startAgoraEngineAndJoin()
         handleMicroOnOff()
         handleCameraOnOff()
 
-        //Handle turn on/off micro and camera (must add event)
         camera.setOnClickListener(View.OnClickListener { view ->
             isCamera=!isCamera
             handleCameraOnOff()
@@ -49,7 +58,7 @@ class Call : AppCompatActivity() {
         call.setOnClickListener {
             handleFinish()
         }
-//
+
     }
 
     override fun onDestroy() {
@@ -60,13 +69,11 @@ class Call : AppCompatActivity() {
     }
 
     private fun createToken() {
-        ///api/generateToken/appID={appID}&appCertificate={appCertificate}&channelName={channelName}
-        return AndroidNetworking.get("http://192.168.1.55:8080/api/generateToken/appID=$APP_ID&appCertificate=$APP_CERTIFICATE&channelName=${channelName}")
+        return AndroidNetworking.get("http://call-video-service.herokuapp.com/api/generateToken/appID=$appId&appCertificate=$appCerti&channelName=${channelName}")
             .build()
             .getAsJSONObject(object : JSONObjectRequestListener {
                 override fun onResponse(response: JSONObject?) {
                     token=response!!.getString("token")
-                    Log.d("Response token: ", response!!.getString("token"))
                 }
 
                 override fun onError(anError: ANError?) {
@@ -83,16 +90,19 @@ class Call : AppCompatActivity() {
         mRtcEngine!!.enableAudio()
         setupLocalVideo()
         createToken()
-        joinChannel()
+        Handler(Looper.getMainLooper()).postDelayed({ joinChannel() },2000)
     }
 
     private fun joinChannel() {
+        Log.d("Response token: ", token)
+        Log.d("Channel Name: ", channelName)
+        Log.d("Appid: ", appId)
         mRtcEngine!!.joinChannel(token, channelName, null, 0)
     }
 
     private fun initializeAgoraEngine() {
         try {
-            mRtcEngine = RtcEngine.create(baseContext, APP_ID, mRtcEngineHandler)
+            mRtcEngine = RtcEngine.create(baseContext, appId, mRtcEngineHandler)
         } catch (e:Exception) {
             Log.d("Creating RTC Enggine error: ", e.message.toString())
         }
@@ -103,9 +113,9 @@ class Call : AppCompatActivity() {
         override fun onUserJoined(uid: Int, elapsed: Int) {
             runOnUiThread{setupRemoteVideo(uid)}
         }
-
         override fun onUserOffline(uid: Int, reason: Int) {
 //          We can handle event that show the form for rating the meeting here
+
             runOnUiThread{onRemoteUserLeft()}
         }
 
