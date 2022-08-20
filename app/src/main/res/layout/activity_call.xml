@@ -49,7 +49,8 @@
             android:layout_centerInParent="true"
             android:src="@drawable/ic_phonecall"
             app:civ_border_color="@color/purple_200"
-            app:civ_border_width="1dp"></de.hdodenhof.circleimageview.CircleImageView>
+            app:civ_border_width="1dp"
+            tools:ignore="MissingClass"></de.hdodenhof.circleimageview.CircleImageView>
 
         <ImageView
             android:id="@+id/camera"
@@ -58,6 +59,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="18dp"
             android:layout_toEndOf="@+id/call"
+            android:background="@color/white"
             app:srcCompat="@drawable/ic_camera" />
 
 
@@ -68,6 +70,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="18dp"
             android:layout_toEndOf="@+id/camera"
+            android:background="@color/white"
             android:src="@drawable/ic_mic"></ImageView>
 
         <ImageView
@@ -77,14 +80,16 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
             android:layout_toStartOf="@+id/call"
+            android:background="#FFFFFF"
             android:src="@drawable/ic_messenger"></ImageView>
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginEnd="18dp"
+            android:background="@color/white"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="18dp"
             android:layout_toStartOf="@+id/chatting"
             android:src="@drawable/ic_share" />
 
