@@ -11,8 +11,6 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.etebarian.meowbottomnavigation.MeowBottomNavigation
-import com.intern.evtutors.activities.APP_CERTIFICATE
-import com.intern.evtutors.activities.APP_ID
 import com.intern.evtutors.fragments.WeeklyScheduleFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
@@ -74,6 +72,4 @@ class MainActivity : AppCompatActivity() {
         outState.putString("WORKAROUND_FOR_BUG_19917_KEY", "WORKAROUND_FOR_BUG_19917_VALUE")
         super.onSaveInstanceState(outState)
     }
-
-
 }
