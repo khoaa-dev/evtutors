@@ -12,11 +12,14 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.intern.evtutors.R
+import com.intern.evtutors.data.CallRepository
+import com.intern.evtutors.models.AgoraApp
 import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -25,17 +28,11 @@ class Call : AppCompatActivity() {
     var isMicro:Boolean=true
     private var channelName:String=""
     private var token:String=""
-    private var appId = ""
-    private var appCerti = ""
+    private var appInfo = AgoraApp("", "")
     private var mRtcEngine:RtcEngine?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
-        val sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE)
-        appId = sharedPreferences.getString("APP_ID", "").toString()
-        appCerti = sharedPreferences.getString("APP_CERTIFICATE", "").toString()
-
-        //Get intent extra
         isCamera = intent.getBooleanExtra("camStatus", true)
         isMicro = intent.getBooleanExtra("micStatus", true)
         channelName = intent.getStringExtra("channelName").toString()
@@ -43,8 +40,6 @@ class Call : AppCompatActivity() {
 
 
         startAgoraEngineAndJoin()
-        handleMicroOnOff()
-        handleCameraOnOff()
 
         camera.setOnClickListener(View.OnClickListener { view ->
             isCamera=!isCamera
@@ -68,43 +63,41 @@ class Call : AppCompatActivity() {
         mRtcEngine = null
     }
 
-    private fun createToken() {
-        return AndroidNetworking.get("http://call-video-service.herokuapp.com/api/generateToken/appID=$appId&appCertificate=$appCerti&channelName=${channelName}")
-            .build()
-            .getAsJSONObject(object : JSONObjectRequestListener {
-                override fun onResponse(response: JSONObject?) {
-                    token=response!!.getString("token")
-                }
-
-                override fun onError(anError: ANError?) {
-                    Log.d("Get app id error: ", anError.toString())
-                }
-            })
+    private suspend fun createToken() {
+            val repository = CallRepository(Dispatchers.IO)
+            Log.d("Start token: ", "1")
+            appInfo = repository.getAppInfo()
+            token = repository.getToken(appInfo.appId, appInfo.appCerti, channelName)
+            Log.d("End token: ", "4")
     }
 
     private fun startAgoraEngineAndJoin() {
-        initializeAgoraEngine()
-        mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
-        mRtcEngine!!.setClientRole(1)
-        mRtcEngine!!.enableVideo()
-        mRtcEngine!!.enableAudio()
-        setupLocalVideo()
-        createToken()
-        Handler(Looper.getMainLooper()).postDelayed({ joinChannel() },2000)
+        //COROURTINE KOTLIN
+        val scope = CoroutineScope(Dispatchers.Main + Job())
+        //Need to handle exception
+        scope.launch {
+            createToken()
+            initializeAgoraEngine()
+            mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+            mRtcEngine!!.setClientRole(1)
+            mRtcEngine!!.enableVideo()
+            mRtcEngine!!.enableAudio()
+            setupLocalVideo()
+            joinChannel()
+            handleMicroOnOff()
+            handleCameraOnOff()
+        }
     }
 
     private fun joinChannel() {
-        Log.d("Response token: ", token)
-        Log.d("Channel Name: ", channelName)
-        Log.d("Appid: ", appId)
         mRtcEngine!!.joinChannel(token, channelName, null, 0)
     }
 
     private fun initializeAgoraEngine() {
         try {
-            mRtcEngine = RtcEngine.create(baseContext, appId, mRtcEngineHandler)
+            mRtcEngine = RtcEngine.create(baseContext, appInfo.appId, mRtcEngineHandler)
         } catch (e:Exception) {
-            Log.d("Creating RTC Enggine error: ", e.message.toString())
+            Log.d("Creating RTC Engine error: ", e.message.toString())
         }
     }
 
