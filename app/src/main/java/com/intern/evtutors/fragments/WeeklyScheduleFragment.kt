@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.google.android.material.tabs.TabLayout
 import com.intern.evtutors.R
 import com.intern.evtutors.adapters.ScheduleAdapter
+import com.intern.evtutors.models.Courses
 import kotlinx.android.synthetic.main.fragment_weekly_schedule.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -22,7 +23,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [WeeklyScheduleFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class WeeklyScheduleFragment : Fragment() {
+class WeeklyScheduleFragment() : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -47,10 +48,12 @@ class WeeklyScheduleFragment : Fragment() {
         classList = view.findViewById(R.id.class_list)
         tabLayout.addTab(tabLayout.newTab().setText("Tuần này"))
         tabLayout.addTab(tabLayout.newTab().setText("Tuần sau"))
-        var data : ArrayList<Int> = ArrayList()
-        for(i in 0..1) {
-            data.add(i)
-        }
+
+        var data : ArrayList<Courses> = ArrayList()
+
+        //Add data
+        data.add(Courses("TOEIC 650", "9:00", "11:00", "Mr. Dinh Khoa", 0))
+        data.add(Courses("TOEIC 650", "18:00", "22:00", "Mr. Dinh Khoa", 1))
 
         classList.adapter = ScheduleAdapter(activity,context, data)
 

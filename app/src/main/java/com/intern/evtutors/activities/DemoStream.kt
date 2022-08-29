@@ -32,7 +32,6 @@ class DemoStream : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_demo_stream)
-        getAppId()
         //Allowing permission
         if(!allPermissionsGranted()) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO), 22)
@@ -56,7 +55,7 @@ class DemoStream : AppCompatActivity() {
 
         btn_start.setOnClickListener {
             val channelName = intent.getStringExtra("channelName").toString()
-            val intent = Intent(this, Call::class.java)
+            val intent = Intent(this,Call::class.java)
             intent.putExtra("micStatus", microStatus)
             intent.putExtra("camStatus", cameraStatus)
             intent.putExtra("channelName", channelName)
@@ -127,31 +126,10 @@ class DemoStream : AppCompatActivity() {
 
     }
 
-    private fun getAppId() {
-        val sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        AndroidNetworking.get("http://call-video-service.herokuapp.com/api/agoraApp")
-            .build()
-            .getAsJSONArray(object : JSONArrayRequestListener {
-                override fun onResponse(response: JSONArray?) {
-                    editor.putString("APP_ID", response!!.getJSONObject(0).getString("appID").toString())
-                    editor.putString("APP_CERTIFICATE", response!!.getJSONObject(0).getString("appCertificate").toString())
-                    editor.commit()
-                    var id=response!!.getJSONObject(0).getString("appID").toString()
-
-                }
-                override fun onError(anError: ANError?) {
-                    Log.d("Get app id error: ", anError.toString())
-                }
-
-            })
-
-
-    }
 
 
     //COMPANION OBJECT: consist of methods that we want to use without creating 'class'
-     companion object {
-            private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
-     }
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
+    }
 }

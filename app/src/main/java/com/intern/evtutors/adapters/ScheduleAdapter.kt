@@ -13,17 +13,21 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.intern.evtutors.R
 import com.intern.evtutors.activities.DemoStream
+import com.intern.evtutors.models.Courses
 
-class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, var data:ArrayList<Int>): BaseAdapter() {
+class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, var data:ArrayList<Courses>): BaseAdapter() {
     class ViewHolder(row:View) {
         var time : TextView
         var classTime: TextView
         var classItem: ConstraintLayout
-
+        var timeEnd: TextView
+        var className: TextView
         init {
             time = row.findViewById(R.id.schedule_time_begin)
+            timeEnd = row.findViewById(R.id.schedule_time_end)
             classTime = row.findViewById(R.id.class_time)
             classItem = row.findViewById(R.id.class_item)
+            className = row.findViewById(R.id.class_name)
 
         }
     }
@@ -52,17 +56,21 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
             viewHolder = convertView.tag as ViewHolder
         }
 
-         var data:Int = getItem(position) as Int
+        var courses:Courses = data[position]
 
 //        handle checking class is streaming or not (must fixed)
-        viewHolder.time.text = "$data:00"
+
+        viewHolder.time.text = courses.timeBegin
+        viewHolder.timeEnd.text = courses.timeEnd
+        viewHolder.className.text = courses.className
         viewHolder.classTime.isVisible = true
-        viewHolder.classTime.isVisible = data=== 0
+        viewHolder.classTime.isVisible = courses.status === 0
 
 //        handle onclick class to join the meeting (must fixed)
-        if(data === 0) {
+        if(courses.status === 0) {
             viewHolder.classItem.setOnClickListener {
                 val intent: Intent = Intent(context, DemoStream::class.java)
+                intent.putExtra("channelName", courses.channelName)
                 activity?.startActivity(intent)
             }
         }
