@@ -1,7 +1,10 @@
 package com.intern.evtutors.activities
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import com.androidnetworking.AndroidNetworking
@@ -9,34 +12,38 @@ import com.androidnetworking.error.ANError
 import com.androidnetworking.interfaces.JSONArrayRequestListener
 import com.androidnetworking.interfaces.JSONObjectRequestListener
 import com.intern.evtutors.R
+import com.intern.evtutors.data.CallRepository
+import com.intern.evtutors.models.AgoraApp
 import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
+import io.agora.rtc.ScreenCaptureParameters
+import io.agora.rtc.mediaio.AgoraDefaultSource
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 
 class Call : AppCompatActivity() {
     var isCamera:Boolean=true
     var isMicro:Boolean=true
-    var channelName:String=""
-    var token:String=""
+    var isshare:Boolean=true
+    private var channelName:String=""
+    private var token:String=""
+    private var appInfo = AgoraApp("", "")
     private var mRtcEngine:RtcEngine?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
-
-        //Get intent extra
         isCamera = intent.getBooleanExtra("camStatus", true)
         isMicro = intent.getBooleanExtra("micStatus", true)
         channelName = intent.getStringExtra("channelName").toString()
 
-        startAgoraEngineAndJoin()
-        handleMicroOnOff()
-        handleCameraOnOff()
 
-        //Handle turn on/off micro and camera (must add event)
+
+        startAgoraEngineAndJoin()
+
         camera.setOnClickListener(View.OnClickListener { view ->
             isCamera=!isCamera
             handleCameraOnOff()
@@ -49,7 +56,11 @@ class Call : AppCompatActivity() {
         call.setOnClickListener {
             handleFinish()
         }
-//
+        share.setOnClickListener(View.OnClickListener { View->
+            evenShare()
+            isshare=!isshare
+        })
+
     }
 
     override fun onDestroy() {
@@ -59,31 +70,30 @@ class Call : AppCompatActivity() {
         mRtcEngine = null
     }
 
-    private fun createToken() {
-        ///api/generateToken/appID={appID}&appCertificate={appCertificate}&channelName={channelName}
-        return AndroidNetworking.get("http://192.168.1.55:8080/api/generateToken/appID=$APP_ID&appCertificate=$APP_CERTIFICATE&channelName=${channelName}")
-            .build()
-            .getAsJSONObject(object : JSONObjectRequestListener {
-                override fun onResponse(response: JSONObject?) {
-                    token=response!!.getString("token")
-                    Log.d("Response token: ", response!!.getString("token"))
-                }
-
-                override fun onError(anError: ANError?) {
-                    Log.d("Get app id error: ", anError.toString())
-                }
-            })
+    private suspend fun createToken() {
+        val repository = CallRepository(Dispatchers.IO)
+        Log.d("Start token: ", "1")
+        appInfo = repository.getAppInfo()
+        token = repository.getToken(appInfo.appId, appInfo.appCerti, channelName)
+        Log.d("End token: ", "4")
     }
 
     private fun startAgoraEngineAndJoin() {
-        initializeAgoraEngine()
-        mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
-        mRtcEngine!!.setClientRole(1)
-        mRtcEngine!!.enableVideo()
-        mRtcEngine!!.enableAudio()
-        setupLocalVideo()
-        createToken()
-        joinChannel()
+        //COROURTINE KOTLIN
+        val scope = CoroutineScope(Dispatchers.Main + Job())
+        //Need to handle exception
+        scope.launch {
+            createToken()
+            initializeAgoraEngine()
+            mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+            mRtcEngine!!.setClientRole(1)
+            mRtcEngine!!.enableVideo()
+            mRtcEngine!!.enableAudio()
+            setupLocalVideo()
+            joinChannel()
+            handleMicroOnOff()
+            handleCameraOnOff()
+        }
     }
 
     private fun joinChannel() {
@@ -92,9 +102,9 @@ class Call : AppCompatActivity() {
 
     private fun initializeAgoraEngine() {
         try {
-            mRtcEngine = RtcEngine.create(baseContext, APP_ID, mRtcEngineHandler)
+            mRtcEngine = RtcEngine.create(baseContext, appInfo.appId, mRtcEngineHandler)
         } catch (e:Exception) {
-            Log.d("Creating RTC Enggine error: ", e.message.toString())
+            Log.d("Creating RTC Engine error: ", e.message.toString())
         }
     }
 
@@ -103,9 +113,9 @@ class Call : AppCompatActivity() {
         override fun onUserJoined(uid: Int, elapsed: Int) {
             runOnUiThread{setupRemoteVideo(uid)}
         }
-
         override fun onUserOffline(uid: Int, reason: Int) {
 //          We can handle event that show the form for rating the meeting here
+
             runOnUiThread{onRemoteUserLeft()}
         }
 
@@ -155,6 +165,30 @@ class Call : AppCompatActivity() {
             mic.setImageResource(R.drawable.ic_mute)
             mRtcEngine!!.enableLocalAudio(false)
         }
+    }
+    private fun evenShare(){
+        if(isshare){
+            share.setImageResource(R.drawable.ic_share_start)
+            shareScreen()
+        }else{
+            share.setImageResource(R.drawable.ic_share)
+            stopshareScreen()
+        }
+    }
+    private fun shareScreen(){
+        mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+        mRtcEngine!!.setClientRole(IRtcEngineEventHandler.ClientRole.CLIENT_ROLE_BROADCASTER)
+        val screenCaptureParameters = ScreenCaptureParameters()
+        screenCaptureParameters.captureAudio = true
+        screenCaptureParameters.captureVideo = true
+        val videoCaptureParameters: ScreenCaptureParameters.VideoCaptureParameters =
+            ScreenCaptureParameters.VideoCaptureParameters()
+        screenCaptureParameters.videoCaptureParameters = videoCaptureParameters
+        mRtcEngine!!.startScreenCapture(screenCaptureParameters)
+    }
+    private fun stopshareScreen(){
+        mRtcEngine!!.stopScreenCapture()
+        mRtcEngine!!.setVideoSource(AgoraDefaultSource())
     }
 
     private fun handleFinish() {

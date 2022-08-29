@@ -52,14 +52,17 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.etebarian:meow-bottom-navigation-java:1.2.0'
 
-//    def camerax_version = "1.0.0-beta12"
-    // CameraX core library using camera2 implementation
+
     implementation "androidx.camera:camera-camera2:1.0.0-beta12"
     implementation "androidx.camera:camera-lifecycle:1.0.0-beta12"
     implementation "androidx.camera:camera-view:1.0.0-alpha19"
-
-    implementation 'com.amitshekhar.android:android-networking:1.0.2'
-
     //agora sdk
-    implementation 'com.github.agorabuilder:native-full-sdk:3.5.0.3'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
+    implementation 'io.agora.rtc:full-sdk:3.7.1'
+    //Android networking
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
+    //kotlin coroutine
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0-alpha03"
 }
