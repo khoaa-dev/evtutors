@@ -49,16 +49,16 @@ class DemoStream : AppCompatActivity() {
 
         btn_cancel.setOnClickListener {
             var intent: Intent = Intent(baseContext, MainActivity::class.java)
-            Toast.makeText(baseContext,"fafds", Toast.LENGTH_SHORT)
             startActivity(intent)
         }
 
         btn_start.setOnClickListener {
-            val channelName = intent.getStringExtra("channelName").toString()
+            btn_cancel.isEnabled = false
+            val lesson = intent.getSerializableExtra("lesson")
             val intent = Intent(this, Call::class.java)
             intent.putExtra("micStatus", microStatus)
             intent.putExtra("camStatus", cameraStatus)
-            intent.putExtra("channelName", channelName)
+            intent.putExtra("lesson", lesson)
             startActivity(intent)
         }
     }
@@ -88,9 +88,7 @@ class DemoStream : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener(Runnable {
-
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
             // Preview
             val preview = Preview.Builder()
                 .build()
@@ -98,7 +96,7 @@ class DemoStream : AppCompatActivity() {
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
-            // Lựa chọn mặc định dùng camera sau.
+            // Lựa chọn mặc định dùng camera trước.
             val cameraSelector:CameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
             // Bên trong khối try, hãy đảm bảo không có gì liên kết với cameraProvider, sau đó liên kết cameraSelector và đối tượng Preview với cameraProvider.
@@ -123,7 +121,6 @@ class DemoStream : AppCompatActivity() {
         ContextCompat.checkSelfPermission(
             baseContext, it
         ) == PackageManager.PERMISSION_GRANTED
-
     }
 
 

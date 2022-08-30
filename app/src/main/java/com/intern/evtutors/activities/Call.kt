@@ -1,43 +1,38 @@
 package com.intern.evtutors.activities
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
-import com.androidnetworking.AndroidNetworking
-import com.androidnetworking.error.ANError
-import com.androidnetworking.interfaces.JSONArrayRequestListener
-import com.androidnetworking.interfaces.JSONObjectRequestListener
+import androidx.core.view.isVisible
 import com.intern.evtutors.R
 import com.intern.evtutors.data.CallRepository
+import com.intern.evtutors.data.LessonRepository
 import com.intern.evtutors.models.AgoraApp
+import com.intern.evtutors.models.Lesson
 import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
+import io.agora.rtc.internal.LastmileProbeConfig
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
 import kotlinx.coroutines.*
-import org.json.JSONArray
-import org.json.JSONObject
 
 class Call : AppCompatActivity() {
-    var isCamera:Boolean=true
+    private var isCamera:Boolean=true
     var isMicro:Boolean=true
-    private var channelName:String=""
+    private var lesson: Lesson?=null
     private var token:String=""
     private var appInfo = AgoraApp("", "")
     private var mRtcEngine:RtcEngine?=null
+    private val callRepository = CallRepository(Dispatchers.IO)
+    private val lessonRepository = LessonRepository(Dispatchers.IO)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
         isCamera = intent.getBooleanExtra("camStatus", true)
         isMicro = intent.getBooleanExtra("micStatus", true)
-        channelName = intent.getStringExtra("channelName").toString()
-
-
+        lesson = intent.getSerializableExtra("lesson") as Lesson
 
         startAgoraEngineAndJoin()
 
@@ -63,19 +58,12 @@ class Call : AppCompatActivity() {
         mRtcEngine = null
     }
 
-    private suspend fun createToken() {
-            val repository = CallRepository(Dispatchers.IO)
-            Log.d("Start token: ", "1")
-            appInfo = repository.getAppInfo()
-            token = repository.getToken(appInfo.appId, appInfo.appCerti, channelName)
-            Log.d("End token: ", "4")
-    }
-
     private fun startAgoraEngineAndJoin() {
         //COROURTINE KOTLIN
         val scope = CoroutineScope(Dispatchers.Main + Job())
         //Need to handle exception
         scope.launch {
+            //checking channel name
             createToken()
             initializeAgoraEngine()
             mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
@@ -84,13 +72,30 @@ class Call : AppCompatActivity() {
             mRtcEngine!!.enableAudio()
             setupLocalVideo()
             joinChannel()
+            checkingChannelStatus()
             handleMicroOnOff()
             handleCameraOnOff()
+            progress_bar_layout.isVisible = false
         }
     }
 
+    private suspend fun createToken() {
+        Log.d("Start token: ", "1")
+        appInfo = callRepository.getAppInfo()
+        token = callRepository.getToken(appInfo.appId, appInfo.appCerti, lesson!!.channelName)
+        Log.d("End token: ", "4")
+    }
+
+    private suspend fun checkingChannelStatus() {
+        //considering:
+        if(lesson!!.status == "0") {
+            lessonRepository.updateLessonStatus(lesson!!.id, "1")
+        }
+    }
+
+
     private fun joinChannel() {
-        mRtcEngine!!.joinChannel(token, channelName, null, 0)
+        mRtcEngine!!.joinChannel(token, lesson!!.channelName, null, 0)
     }
 
     private fun initializeAgoraEngine() {

@@ -35,11 +35,10 @@ class MainActivity : AppCompatActivity() {
 
             when (it.id) {
                     1 -> {
-                        fragment = WeeklyScheduleFragment()
+                        loadFragment( WeeklyScheduleFragment())
                     }
                 }
                 loadFragment(fragment)
-
         }
 
 
