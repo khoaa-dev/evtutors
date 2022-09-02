@@ -58,9 +58,9 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation fileTree(dir: "libs", include: ["*.jar","*.aar"])
     implementation 'io.agora.rtc:full-sdk:3.7.1'
-    implementation 'com.github.agorabuilder:native-full-sdk:3.5.0.3'
     //Android networking
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
     //kotlin coroutine
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0-alpha03"
+}    
