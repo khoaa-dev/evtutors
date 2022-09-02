@@ -1,5 +1,6 @@
 package com.intern.evtutors.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -45,6 +46,7 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
         return p0.toLong()
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun getView(position: Int, convertView: View?, p2: ViewGroup?): View {
         var view:View?
         var viewHolder: ViewHolder
@@ -67,12 +69,16 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
         viewHolder.time.text = startHour.hours.toString() + ":00"
         viewHolder.timeEnd.text = endHour.hours.toString() + ":00"
         viewHolder.className.text = lesson.channelName
-        viewHolder.classTime.isVisible = true //false when not in time
+        viewHolder.classTime.isVisible = false //false when not in time
 
-        viewHolder.classItem.setOnClickListener {
-            val intent: Intent = Intent(context, DemoStream::class.java)
-            intent.putExtra("lesson", lesson)
-            activity?.startActivity(intent)
+        if(lesson.id == 1) { //Must fixed: Handled by timing condition below
+            viewHolder.classTime.isVisible = true
+            if(lesson.status == "0") viewHolder.classTime.text = "Start now!"
+            viewHolder.classItem.setOnClickListener {
+                val intent: Intent = Intent(context, DemoStream::class.java)
+                intent.putExtra("lesson", lesson)
+                activity?.startActivity(intent)
+            }
         }
 
         //considering: streaming status is 0 or 1

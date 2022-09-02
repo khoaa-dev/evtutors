@@ -17,6 +17,9 @@ import io.agora.rtc.internal.LastmileProbeConfig
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
 import kotlinx.coroutines.*
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Call : AppCompatActivity() {
     private var isCamera:Boolean=true
@@ -27,6 +30,8 @@ class Call : AppCompatActivity() {
     private var mRtcEngine:RtcEngine?=null
     private val callRepository = CallRepository(Dispatchers.IO)
     private val lessonRepository = LessonRepository(Dispatchers.IO)
+    private var numberAttendants:Int=1
+    private var totalDuration:Int=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call)
@@ -89,7 +94,7 @@ class Call : AppCompatActivity() {
     private suspend fun checkingChannelStatus() {
         //considering:
         if(lesson!!.status == "0") {
-            lessonRepository.updateLessonStatus(lesson!!.id, "1")
+            lessonRepository.updateLesson(lesson!!)
         }
     }
 
@@ -111,14 +116,21 @@ class Call : AppCompatActivity() {
         override fun onUserJoined(uid: Int, elapsed: Int) {
             runOnUiThread{setupRemoteVideo(uid)}
         }
-        override fun onUserOffline(uid: Int, reason: Int) {
-//          We can handle event that show the form for rating the meeting here
 
+        override fun onLeaveChannel(stats: RtcStats?) {
+//          We can handle event that show the form for rating the meeting here
+            runOnUiThread{onRemoteUserLeft()}
+        }
+        override fun onUserOffline(uid: Int, reason: Int) {
             runOnUiThread{onRemoteUserLeft()}
         }
 
         override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-            runOnUiThread{ println("Join channel successfully: $uid")}
+            runOnUiThread{handleLessonStarted()}
+        }
+
+        override fun onRtcStats(stats: RtcStats) {
+            runOnUiThread{handleLessonStatistic(stats)}
         }
     }
 
@@ -126,7 +138,6 @@ class Call : AppCompatActivity() {
         if(remote_video_view_container.childCount >=1) {
             return
         }
-
         val surfaceView = RtcEngine.CreateRendererView(baseContext)
         remote_video_view_container.addView(surfaceView)
         mRtcEngine!!.setupRemoteVideo(VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_FIT, uid))
@@ -139,9 +150,52 @@ class Call : AppCompatActivity() {
         mRtcEngine!!.setupLocalVideo(VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_FIT, 0))
     }
 
-    private fun onRemoteUserLeft() {
-        remote_video_view_container.removeAllViews()
+    private fun handleLessonStarted() {
+        val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+        coroutineScope.launch {
+            val lessonUpdated = lessonRepository.getLessonById(lesson!!.id)
+            Log.d("lesson id", lessonUpdated.id.toString()  )
+            if(lessonUpdated.status != "1") {
+                lessonUpdated.status = "1"
+                lessonRepository.updateLesson(lessonUpdated)
+            }
+        }
     }
+
+    private fun onRemoteUserLeft() {
+        val coroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+        coroutineScope.launch {
+            val lessonUpdated = lessonRepository.getLessonById(lesson!!.id)
+            val date = Date()
+            if(numberAttendants<=1) {
+                Log.d("lesson attendant", numberAttendants.toString())
+                if(lessonUpdated.realTimeStart == "0000-00-00 00:00:00") {
+                    lessonUpdated.realTimeStart = getRealTimeStart(totalDuration, date)
+                }
+                lessonUpdated.status = "2"
+                lessonUpdated.realTimeEnd = formatDateTime(date)
+                Log.d("lesson", lessonUpdated.toString())
+            }
+            lessonRepository.updateLesson(lessonUpdated)
+        }
+    }
+
+    private fun getRealTimeStart(totalDuration:Int, date:Date):String {
+        val result = Date(date.time - (totalDuration*1000))
+        return formatDateTime(result)
+    }
+
+    private fun formatDateTime(date:Date):String {
+        val dateFormat:DateFormat = SimpleDateFormat("yyyy-M-dd hh:mm:ss")
+        return dateFormat.format(date)
+
+    }
+
+    private fun handleLessonStatistic(stats: IRtcEngineEventHandler.RtcStats) {
+        numberAttendants = stats.users
+        totalDuration = stats.totalDuration
+    }
+
 
     private fun handleCameraOnOff() {
         if(isCamera) {
