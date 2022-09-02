@@ -17,6 +17,8 @@ import com.intern.evtutors.models.AgoraApp
 import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
+import io.agora.rtc.ScreenCaptureParameters
+import io.agora.rtc.mediaio.AgoraDefaultSource
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
 import kotlinx.coroutines.*
@@ -26,6 +28,7 @@ import org.json.JSONObject
 class Call : AppCompatActivity() {
     var isCamera:Boolean=true
     var isMicro:Boolean=true
+    var isshare:Boolean=true
     private var channelName:String=""
     private var token:String=""
     private var appInfo = AgoraApp("", "")
@@ -53,6 +56,10 @@ class Call : AppCompatActivity() {
         call.setOnClickListener {
             handleFinish()
         }
+        share.setOnClickListener(View.OnClickListener { View->
+            evenShare()
+            isshare=!isshare
+        })
 
     }
 
@@ -64,11 +71,11 @@ class Call : AppCompatActivity() {
     }
 
     private suspend fun createToken() {
-            val repository = CallRepository(Dispatchers.IO)
-            Log.d("Start token: ", "1")
-            appInfo = repository.getAppInfo()
-            token = repository.getToken(appInfo.appId, appInfo.appCerti, channelName)
-            Log.d("End token: ", "4")
+        val repository = CallRepository(Dispatchers.IO)
+        Log.d("Start token: ", "1")
+        appInfo = repository.getAppInfo()
+        token = repository.getToken(appInfo.appId, appInfo.appCerti, channelName)
+        Log.d("End token: ", "4")
     }
 
     private fun startAgoraEngineAndJoin() {
@@ -158,6 +165,30 @@ class Call : AppCompatActivity() {
             mic.setImageResource(R.drawable.ic_mute)
             mRtcEngine!!.enableLocalAudio(false)
         }
+    }
+    private fun evenShare(){
+        if(isshare){
+            share.setImageResource(R.drawable.ic_share_start)
+            shareScreen()
+        }else{
+            share.setImageResource(R.drawable.ic_share)
+            stopshareScreen()
+        }
+    }
+    private fun shareScreen(){
+        mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+        mRtcEngine!!.setClientRole(IRtcEngineEventHandler.ClientRole.CLIENT_ROLE_BROADCASTER)
+        val screenCaptureParameters = ScreenCaptureParameters()
+        screenCaptureParameters.captureAudio = true
+        screenCaptureParameters.captureVideo = true
+        val videoCaptureParameters: ScreenCaptureParameters.VideoCaptureParameters =
+            ScreenCaptureParameters.VideoCaptureParameters()
+        screenCaptureParameters.videoCaptureParameters = videoCaptureParameters
+        mRtcEngine!!.startScreenCapture(screenCaptureParameters)
+    }
+    private fun stopshareScreen(){
+        mRtcEngine!!.stopScreenCapture()
+        mRtcEngine!!.setVideoSource(AgoraDefaultSource())
     }
 
     private fun handleFinish() {

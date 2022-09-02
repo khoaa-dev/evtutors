@@ -34,11 +34,11 @@ class MainActivity : AppCompatActivity() {
             var fragment:Fragment=WeeklyScheduleFragment()
 
             when (it.id) {
-                    1 -> {
-                        fragment = WeeklyScheduleFragment()
-                    }
+                1 -> {
+                    fragment = WeeklyScheduleFragment()
                 }
-                loadFragment(fragment)
+            }
+            loadFragment(fragment)
 
         }
 

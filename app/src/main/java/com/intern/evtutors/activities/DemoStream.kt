@@ -55,7 +55,7 @@ class DemoStream : AppCompatActivity() {
 
         btn_start.setOnClickListener {
             val channelName = intent.getStringExtra("channelName").toString()
-            val intent = Intent(this, Call::class.java)
+            val intent = Intent(this,Call::class.java)
             intent.putExtra("micStatus", microStatus)
             intent.putExtra("camStatus", cameraStatus)
             intent.putExtra("channelName", channelName)
@@ -129,7 +129,7 @@ class DemoStream : AppCompatActivity() {
 
 
     //COMPANION OBJECT: consist of methods that we want to use without creating 'class'
-     companion object {
-            private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
-     }
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
+    }
 }

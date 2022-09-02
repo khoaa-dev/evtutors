@@ -56,7 +56,7 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
             viewHolder = convertView.tag as ViewHolder
         }
 
-         var courses:Courses = data[position]
+        var courses:Courses = data[position]
 
 //        handle checking class is streaming or not (must fixed)
 
