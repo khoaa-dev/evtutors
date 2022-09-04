@@ -29,17 +29,16 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.add(MeowBottomNavigation.Model(2, R.drawable.ic_heart))
         bottom_navigation.add(MeowBottomNavigation.Model(3, R.drawable.ic_bell))
         bottom_navigation.add(MeowBottomNavigation.Model(4, R.drawable.ic_person))
-
+        loadFragment( WeeklyScheduleFragment())
         bottom_navigation.setOnShowListener {
             var fragment:Fragment=WeeklyScheduleFragment()
 
             when (it.id) {
-                1 -> {
-                    fragment = WeeklyScheduleFragment()
+                    1 -> {
+                        loadFragment( WeeklyScheduleFragment())
+                    }
                 }
-            }
-            loadFragment(fragment)
-
+                loadFragment(fragment)
         }
 
 
