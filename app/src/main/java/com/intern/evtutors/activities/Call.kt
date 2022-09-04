@@ -14,6 +14,8 @@ import io.agora.rtc.Constants
 import io.agora.rtc.IRtcEngineEventHandler
 import io.agora.rtc.RtcEngine
 import io.agora.rtc.internal.LastmileProbeConfig
+import io.agora.rtc.ScreenCaptureParameters
+import io.agora.rtc.mediaio.AgoraDefaultSource
 import io.agora.rtc.video.VideoCanvas
 import kotlinx.android.synthetic.main.activity_call.*
 import kotlinx.coroutines.*
@@ -53,6 +55,10 @@ class Call : AppCompatActivity() {
         call.setOnClickListener {
             handleFinish()
         }
+        share.setOnClickListener(View.OnClickListener { View->
+            evenShare()
+            isshare=!isshare
+        })
 
     }
 
@@ -217,6 +223,30 @@ class Call : AppCompatActivity() {
             mic.setImageResource(R.drawable.ic_mute)
             mRtcEngine!!.enableLocalAudio(false)
         }
+    }
+    private fun evenShare(){
+        if(isshare){
+            share.setImageResource(R.drawable.ic_share_start)
+            shareScreen()
+        }else{
+            share.setImageResource(R.drawable.ic_share)
+            stopshareScreen()
+        }
+    }
+    private fun shareScreen(){
+        mRtcEngine!!.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING)
+        mRtcEngine!!.setClientRole(IRtcEngineEventHandler.ClientRole.CLIENT_ROLE_BROADCASTER)
+        val screenCaptureParameters = ScreenCaptureParameters()
+        screenCaptureParameters.captureAudio = true
+        screenCaptureParameters.captureVideo = true
+        val videoCaptureParameters: ScreenCaptureParameters.VideoCaptureParameters =
+            ScreenCaptureParameters.VideoCaptureParameters()
+        screenCaptureParameters.videoCaptureParameters = videoCaptureParameters
+        mRtcEngine!!.startScreenCapture(screenCaptureParameters)
+    }
+    private fun stopshareScreen(){
+        mRtcEngine!!.stopScreenCapture()
+        mRtcEngine!!.setVideoSource(AgoraDefaultSource())
     }
 
     private fun handleFinish() {

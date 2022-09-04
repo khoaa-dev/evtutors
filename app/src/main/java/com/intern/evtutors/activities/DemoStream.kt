@@ -126,7 +126,7 @@ class DemoStream : AppCompatActivity() {
 
 
     //COMPANION OBJECT: consist of methods that we want to use without creating 'class'
-     companion object {
-            private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
-     }
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
+    }
 }

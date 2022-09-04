@@ -61,7 +61,6 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
         }
 
          var lesson:Lesson = data[position]
-
 //        handle checking class is streaming or not (must fixed)
         val startHour = SimpleDateFormat("yyyy-M-dd hh:mm:ss").parse(lesson.timeStart)
         val endHour = SimpleDateFormat("yyyy-M-dd hh:mm:ss").parse(lesson.timeEnd)
