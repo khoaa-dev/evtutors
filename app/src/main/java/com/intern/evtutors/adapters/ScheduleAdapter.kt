@@ -1,8 +1,9 @@
 package com.intern.evtutors.adapters
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +14,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import com.intern.evtutors.R
 import com.intern.evtutors.activities.DemoStream
-import com.intern.evtutors.models.Courses
+import com.intern.evtutors.models.Lesson
+import java.text.SimpleDateFormat
+import java.util.*
 
-class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, var data:ArrayList<Courses>): BaseAdapter() {
+class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, var data:MutableList<Lesson>): BaseAdapter() {
     class ViewHolder(row:View) {
         var time : TextView
         var classTime: TextView
@@ -43,6 +46,7 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
         return p0.toLong()
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun getView(position: Int, convertView: View?, p2: ViewGroup?): View {
         var view:View?
         var viewHolder: ViewHolder
@@ -56,24 +60,43 @@ class ScheduleAdapter(var activity: FragmentActivity?, var context: Context?, va
             viewHolder = convertView.tag as ViewHolder
         }
 
-        var courses:Courses = data[position]
-
+         var lesson:Lesson = data[position]
 //        handle checking class is streaming or not (must fixed)
+        val startHour = SimpleDateFormat("yyyy-M-dd hh:mm:ss").parse(lesson.timeStart)
+        val endHour = SimpleDateFormat("yyyy-M-dd hh:mm:ss").parse(lesson.timeEnd)
 
-        viewHolder.time.text = courses.timeBegin
-        viewHolder.timeEnd.text = courses.timeEnd
-        viewHolder.className.text = courses.className
-        viewHolder.classTime.isVisible = true
-        viewHolder.classTime.isVisible = courses.status === 0
+        viewHolder.time.text = startHour.hours.toString() + ":00"
+        viewHolder.timeEnd.text = endHour.hours.toString() + ":00"
+        viewHolder.className.text = lesson.channelName
+        viewHolder.classTime.isVisible = false //false when not in time
 
-//        handle onclick class to join the meeting (must fixed)
-        if(courses.status === 0) {
+        if(lesson.id == 1) { //Must fixed: Handled by timing condition below
+            viewHolder.classTime.isVisible = true
+            if(lesson.status == "0") viewHolder.classTime.text = "Start now!"
             viewHolder.classItem.setOnClickListener {
                 val intent: Intent = Intent(context, DemoStream::class.java)
-                intent.putExtra("channelName", courses.channelName)
+                intent.putExtra("lesson", lesson)
                 activity?.startActivity(intent)
             }
         }
+
+        //considering: streaming status is 0 or 1
+
+////       handle onclick class to join the meeting
+//        val date = Date()
+//        if(date >= startHour) {
+//            if(date <= endHour) {
+//                viewHolder.classItem.setOnClickListener {
+//                    val intent: Intent = Intent(context, DemoStream::class.java)
+//                    intent.putExtra("lesson", lesson)
+//                    activity?.startActivity(intent)
+//                }
+//                viewHolder.classTime.isVisible = true
+//            } else {
+//                //enable lesson item (constraint layout)
+//            }
+//        }
+
         return view as View
     }
 

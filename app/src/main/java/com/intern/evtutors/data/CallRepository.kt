@@ -31,8 +31,6 @@ class CallRepository(private val dispatcher:CoroutineDispatcher) {
             }
             appInfo
         }
-
-
     suspend fun getToken(appId:String, appCerti:String, channelName:String):String =
         withContext(dispatcher) {
             var token = ""
@@ -53,5 +51,4 @@ class CallRepository(private val dispatcher:CoroutineDispatcher) {
             }
             token
         }
-
 }

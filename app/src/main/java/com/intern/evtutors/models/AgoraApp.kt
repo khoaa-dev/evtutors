@@ -1,3 +1,3 @@
 package com.intern.evtutors.models
 
-data class AgoraApp(var appId:String="fgfsfdgdfg", var appCerti:String)
+data class AgoraApp(var appId:String, var appCerti:String)

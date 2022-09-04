@@ -7,35 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.intern.evtutors.R
 import com.intern.evtutors.adapters.ScheduleAdapter
-import com.intern.evtutors.models.Courses
+import com.intern.evtutors.data.LessonRepository
 import kotlinx.android.synthetic.main.fragment_weekly_schedule.*
+import kotlinx.coroutines.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [WeeklyScheduleFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class WeeklyScheduleFragment() : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
     lateinit var tabLayout:TabLayout
     lateinit var classList:ListView
-    lateinit var text_view: TextView
+    lateinit var loadingStatement: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -46,16 +31,17 @@ class WeeklyScheduleFragment() : Fragment() {
         val view:View = inflater.inflate(R.layout.fragment_weekly_schedule, container, false)
         tabLayout = view.findViewById(R.id.tab_layout)
         classList = view.findViewById(R.id.class_list)
+        loadingStatement = view.findViewById(R.id.loading_statement)
         tabLayout.addTab(tabLayout.newTab().setText("Tuần này"))
         tabLayout.addTab(tabLayout.newTab().setText("Tuần sau"))
 
-        var data : ArrayList<Courses> = ArrayList()
-
-        //Add data
-        data.add(Courses("TOEIC 650", "9:00", "11:00", "Mr. Dinh Khoa", 0))
-        data.add(Courses("TOEIC 650", "18:00", "22:00", "Mr. Dinh Khoa", 1))
-
-        classList.adapter = ScheduleAdapter(activity,context, data)
+        val scope = CoroutineScope(Job() + Dispatchers.Main + CoroutineName("lesson_handler"))
+        var lessonRepository = LessonRepository(Dispatchers.IO)
+        scope.launch {
+            val data = lessonRepository.getAllLessons()
+            loadingStatement.isVisible = false
+            classList.adapter = ScheduleAdapter(activity,context, data)
+        }
 
         return view
     }
