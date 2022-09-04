@@ -26,6 +26,7 @@ import java.util.*
 class Call : AppCompatActivity() {
     private var isCamera:Boolean=true
     var isMicro:Boolean=true
+    var isshare:Boolean=true
     private var lesson: Lesson?=null
     private var token:String=""
     private var appInfo = AgoraApp("", "")
