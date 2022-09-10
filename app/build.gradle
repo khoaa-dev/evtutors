@@ -5,14 +5,15 @@ plugins {
 }
 
 android {
+    def code = System.env.BUILD_NUMBER
     compileSdk 31
-
+    buildToolsVersion '31.0.0'
     defaultConfig {
         applicationId "com.intern.evtutors"
         minSdk 24
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode System.getenv("BUILD_NUMBER") as Integer ?: 9999
+        versionName "1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,8 +43,10 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+
+
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     testImplementation 'junit:junit:4.13.2'
