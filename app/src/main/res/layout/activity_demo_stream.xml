@@ -7,29 +7,52 @@
     android:background="@color/purple_light"
     tools:context=".activities.DemoStream">
 
-  <androidx.camera.view.PreviewView
-      android:id="@+id/previewView"
-      android:layout_width="300dp"
-      android:layout_height="0dp"
-      android:layout_marginTop="40dp"
-      android:layout_marginBottom="40dp"
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="465dp"
       app:layout_constraintBottom_toTopOf="@+id/container"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintTop_toTopOf="parent">
 
-  <TextView
-      android:id="@+id/txt_camera"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Camera is turned off!"
-      android:textColor="@color/main_color"
-      android:textSize="20dp"
-      android:visibility="invisible"
-      app:layout_constraintBottom_toTopOf="@+id/container"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+    <androidx.camera.view.PreviewView
+
+        android:id="@+id/previewView"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+
+
+
+    </androidx.camera.view.PreviewView>
+
+    <TextView
+        android:id="@+id/txt_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="50dp"
+        android:text="Camera is turned off!"
+        android:textColor="@color/main_color"
+        android:textSize="20dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 
   <LinearLayout
@@ -41,7 +64,7 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="0.0"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/previewView"
+
       app:layout_constraintVertical_bias="1.0">
 
     <LinearLayout
