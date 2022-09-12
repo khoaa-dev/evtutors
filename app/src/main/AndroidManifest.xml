@@ -18,9 +18,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".activities.create_account"
+            android:exported="false" />
+        <activity
+            android:name=".activities.login"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

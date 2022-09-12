@@ -21,6 +21,7 @@ import com.example.myapplication.onboardingitemAdapter
 import com.google.android.material.button.MaterialButton
 import com.intern.evtutors.MainActivity
 import com.intern.evtutors.R
+import com.intern.evtutors.activities.login
 
 class onboardingstart : AppCompatActivity() {
 
@@ -135,7 +136,7 @@ class onboardingstart : AppCompatActivity() {
     }
 
     private fun navigateTohome(){
-        startActivity(Intent(applicationContext, MainActivity::class.java))
+        startActivity(Intent(applicationContext, login::class.java))
         finish()
         with (share.edit()) {
             putBoolean("CHECKBOX",true)

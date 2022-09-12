@@ -16,7 +16,7 @@
         <item name="android:clickable">true</item>
 
     </style>
-
+    <style name="line" parent="Widget.Material3.TextInputLayout.FilledBox"/>
 
     <style name="MyMaterialTheme">MyMaterialTheme</style>
 </resources>
