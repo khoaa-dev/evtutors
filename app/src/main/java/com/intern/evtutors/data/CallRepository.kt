@@ -12,15 +12,15 @@ class CallRepository(private val dispatcher:CoroutineDispatcher) {
     suspend fun getAppInfo():AgoraApp =
         withContext(dispatcher) {
             var appInfo = AgoraApp("", "")
-            val request = AndroidNetworking.get("http://call-video-service.herokuapp.com/api/agoraApp")
+            val request = AndroidNetworking.get("http://call-video-service.herokuapp.com/api/agoraApp/id=1")
                 .build()
             try {
-                val response = request.executeForJSONArray()
+                val response = request.executeForJSONObject()
                 if(response.isSuccess) {
-                    val result = response.result as JSONArray
-                    appInfo.appId = result.getJSONObject(0).getString("appID")
-                    appInfo.appCerti = result.getJSONObject(0).getString("appCertificate")
-                    Log.d("App id for token 2: ", result.getJSONObject(0).getString("appID"))
+                    val result = response.result as JSONObject
+                    appInfo.appId = result.getString("appID")
+                    appInfo.appCerti = result.getString("appCertificate")
+                    Log.d("App id for token 2: ", result.getString("appID"))
                 } else {
                     //throw exception
                     Log.d("Getting id error ", response.toString())
