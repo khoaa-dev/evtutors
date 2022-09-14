@@ -7,30 +7,27 @@
     android:background="@color/purple_light"
     tools:context=".activities.DemoStream">
 
+
   <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="465dp"
       app:layout_constraintBottom_toTopOf="@+id/container"
       app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1.0"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent">
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="1.0">
 
     <androidx.camera.view.PreviewView
 
         android:id="@+id/previewView"
-        android:layout_width="300dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
-
+        android:layout_width="273dp"
+        android:layout_height="374dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
 
-
+        app:layout_constraintTop_toTopOf="parent">
 
 
     </androidx.camera.view.PreviewView>
@@ -51,9 +48,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 
   <LinearLayout
       android:id="@+id/container"
